@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment | LPU Enrollment System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-left">
+      <img src="Seal_of_Lyceum_of_the_Philippines_University.svg.png" alt="LPU Logo" class="logo">
+      <h1 class="dashboard-title">LPU Enrollment System</h1>
+    </div>
+    <button class="logout-button">Logout</button>
+  </div>
+
+  <div class="content-area">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <button class="nav-btn" onclick="location.href='dashboard.html'">Home</button>
+      <button class="nav-btn active">Enrollment</button>
+      <button class="nav-btn" onclick="location.href='grades.html'">Grades</button>
+      <button class="nav-btn" onclick="location.href='settings.html'">Settings</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <h2 class="welcome-title">Enrollment Services</h2>
+
+      <div class="enrollment-section">
+        <label>
+          <input type="checkbox" id="regularStudent"> Are you a regular student?
+        </label>
+
+        <div class="input-group">
+          <label for="sectionInput">Enter section:</label>
+          <input type="text" id="sectionInput" disabled placeholder="e.g. BSCS 3-2">
+        </div>
+
+        <button id="loadCourses" class="btn" disabled>Load Courses to Cart</button>
+      </div>
+
+      <div class="enrollment-layout">
+        <!-- LEFT: Available Courses -->
+        <div class="courses">
+          <h3>Available Courses</h3>
+          <table class="courses-table">
+            <thead>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Units</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>IT101</td>
+                <td>Introduction to Computing</td>
+                <td>3</td>
+                <td><button class="add-btn">Add</button></td>
+              </tr>
+              <tr>
+                <td>CS201</td>
+                <td>Data Structures</td>
+                <td>3</td>
+                <td><button class="add-btn">Add</button></td>
+              </tr>
+              <tr>
+                <td>CS301</td>
+                <td>Algorithms and Complexity</td>
+                <td>3</td>
+                <td><button class="add-btn">Add</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RIGHT: Cart -->
+        <div class="cart-section">
+          <h3>Your Course Cart (Selected Courses)</h3>
+          <ul id="cartList" class="cart-list">
+            <!-- Items will appear here -->
+          </ul>
+          <p id="totalUnits" class="cart-summary">Total Units: 0</p>
+          <button id="checkout" class="checkout-button">Proceed to Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enable section input if regular student
+    const regularCheckbox = document.getElementById('regularStudent');
+    const sectionInput = document.getElementById('sectionInput');
+    const loadCoursesBtn = document.getElementById('loadCourses');
+
+    regularCheckbox.addEventListener('change', () => {
+      const isRegular = regularCheckbox.checked;
+      sectionInput.disabled = !isRegular;
+      loadCoursesBtn.disabled = !isRegular;
+    });
+
+    // ----- ADD TO CART FUNCTIONALITY -----
+    const addButtons = document.querySelectorAll('.add-btn');
+    const cartList = document.getElementById('cartList');
+    const totalUnitsDisplay = document.getElementById('totalUnits');
+    let totalUnits = 0;
+    const cartItems = new Set(); // To avoid duplicates
+
+    addButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const row = button.closest('tr');
+        const courseCode = row.children[0].textContent;
+        const courseName = row.children[1].textContent;
+        const units = parseInt(row.children[2].textContent);
+
+        // Prevent duplicates
+        if (cartItems.has(courseCode)) {
+          alert(`${courseCode} is already in your cart.`);
+          return;
+        }
+
+        // Add to cart visually
+        const li = document.createElement('li');
+        li.textContent = `${courseCode} - ${courseName} (${units} units)`;
+
+        // Add a remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.classList.add('remove-btn');
+        removeBtn.style.marginLeft = '10px';
+        removeBtn.onclick = () => {
+          cartList.removeChild(li);
+          cartItems.delete(courseCode);
+          totalUnits -= units;
+          totalUnitsDisplay.textContent = `Total Units: ${totalUnits}`;
+        };
+
+        li.appendChild(removeBtn);
+        cartList.appendChild(li);
+
+        // Update totals
+        cartItems.add(courseCode);
+        totalUnits += units;
+        totalUnitsDisplay.textContent = `Total Units: ${totalUnits}`;
+      });
+    });
+  </script>
+</body>
+</html>

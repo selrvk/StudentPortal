@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LPU Enrollment - Checkout</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .checkout-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 40px auto;
+      max-width: 600px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .checkout-container h2 {
+      text-align: center;
+      color: #8b0000;
+      margin-bottom: 15px;
+    }
+
+    .checkout-list {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0;
+    }
+
+    .checkout-list li {
+      background: #f9f9f9;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.95em;
+    }
+
+    .checkout-total {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 15px;
+      color: #333;
+    }
+
+    .back-btn {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 18px;
+      background: #8b0000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #a80000;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <header class="top-bar">
+      <div class="top-left">
+        <img src="Seal_of_Lyceum_of_the_Philippines_University.svg.png" alt="LPU Logo" class="logo">
+        <h1 class="dashboard-title">LPU Enrollment System</h1>
+      </div>
+      <button class="logout-button" onclick="window.location.href='index.html'">Logout</button>
+    </header>
+
+    <div class="content-area">
+      <nav class="sidebar">
+        <button class="nav-btn" onclick="window.location.href='dashboard.html'">Home</button>
+        <button class="nav-btn" onclick="window.location.href='enrollment.html'">Enrollment</button>
+        <button class="nav-btn" onclick="window.location.href='grades.html'">Grades</button>
+        <button class="nav-btn" onclick="window.location.href='settings.html'">Settings</button>
+      </nav>
+
+      <div class="checkout-container">
+        <h2>Your Selected Courses</h2>
+        <ul id="checkoutList" class="checkout-list"></ul>
+        <p id="checkoutTotal" class="checkout-total">Total Units: 0</p>
+        <button class="back-btn" onclick="window.location.href='enrollment.html'">Back to Enrollment</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const checkoutList = document.getElementById('checkoutList');
+      const checkoutTotal = document.getElementById('checkoutTotal');
+
+      const cartData = JSON.parse(localStorage.getItem('enrollmentCart')) || [];
+      let totalUnits = 0;
+
+      cartData.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+
+        const match = item.match(/\((\d+)\s*units?\)/);
+        if (match) totalUnits += parseInt(match[1]);
+
+        checkoutList.appendChild(li);
+      });
+
+      checkoutTotal.textContent = `Total Units: ${totalUnits}`;
+    });
+  </script>
+</body>
+</html>

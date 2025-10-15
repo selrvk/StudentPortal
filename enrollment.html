@@ -5,6 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Enrollment | LPU Enrollment System</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* === CART STYLING ENHANCEMENTS === */
+    .cart-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .cart-section h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: #8b0000;
+      font-size: 1.2em;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 8px;
+    }
+
+    .cart-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .cart-list li {
+      background: #f9f9f9;
+      border-radius: 8px;
+      margin: 8px 0;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95em;
+      transition: background 0.2s;
+    }
+
+    .cart-list li:nth-child(even) {
+      background: #f0f0f0;
+    }
+
+    .cart-list li:hover {
+      background: #e8e8e8;
+    }
+
+    .remove-btn {
+      background-color: #ff4d4d;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .remove-btn:hover {
+      background-color: #e60000;
+    }
+
+    .cart-summary {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .checkout-button {
+      display: block;
+      margin: 15px auto 0;
+      background: #8b0000;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .checkout-button:hover {
+      background: #a80000;
+    }
+  </style>
 </head>
 <body class="dashboard">
 
@@ -81,10 +167,8 @@
 
         <!-- RIGHT: Cart -->
         <div class="cart-section">
-          <h3>Your Course Cart (Selected Courses)</h3>
-          <ul id="cartList" class="cart-list">
-            <!-- Items will appear here -->
-          </ul>
+          <h3>Your Course Cart</h3>
+          <ul id="cartList" class="cart-list"></ul>
           <p id="totalUnits" class="cart-summary">Total Units: 0</p>
           <button id="checkout" class="checkout-button">Proceed to Checkout</button>
         </div>
@@ -108,8 +192,9 @@
     const addButtons = document.querySelectorAll('.add-btn');
     const cartList = document.getElementById('cartList');
     const totalUnitsDisplay = document.getElementById('totalUnits');
+    const checkoutBtn = document.getElementById('checkout');
     let totalUnits = 0;
-    const cartItems = new Set(); // To avoid duplicates
+    const cartItems = new Set();
 
     addButtons.forEach(button => {
       button.addEventListener('click', () => {
@@ -118,21 +203,18 @@
         const courseName = row.children[1].textContent;
         const units = parseInt(row.children[2].textContent);
 
-        // Prevent duplicates
         if (cartItems.has(courseCode)) {
           alert(`${courseCode} is already in your cart.`);
           return;
         }
 
-        // Add to cart visually
         const li = document.createElement('li');
-        li.textContent = `${courseCode} - ${courseName} (${units} units)`;
+        const textSpan = document.createElement('span');
+        textSpan.textContent = `${courseCode} - ${courseName} (${units} units)`;
 
-        // Add a remove button
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
         removeBtn.classList.add('remove-btn');
-        removeBtn.style.marginLeft = '10px';
         removeBtn.onclick = () => {
           cartList.removeChild(li);
           cartItems.delete(courseCode);
@@ -140,14 +222,27 @@
           totalUnitsDisplay.textContent = `Total Units: ${totalUnits}`;
         };
 
+        li.appendChild(textSpan);
         li.appendChild(removeBtn);
         cartList.appendChild(li);
 
-        // Update totals
         cartItems.add(courseCode);
         totalUnits += units;
         totalUnitsDisplay.textContent = `Total Units: ${totalUnits}`;
       });
+    });
+
+    // ----- CHECKOUT (Save to localStorage) -----
+    checkoutBtn.addEventListener('click', () => {
+      const cartArray = Array.from(cartItems).map(courseCode => {
+        const li = [...cartList.children].find(item =>
+          item.textContent.includes(courseCode)
+        );
+        return li ? li.firstChild.textContent : '';
+      });
+
+      localStorage.setItem('enrollmentCart', JSON.stringify(cartArray));
+      window.location.href = 'checkout.html';
     });
   </script>
 </body>
